@@ -1,11 +1,11 @@
 ---
-# Per environment values which override defaults in hmpps-template-kotlin/values.yaml
+# Per environment values which override defaults in hmpps-datahub-query-metrics/values.yaml
 
 generic-service:
   replicaCount: 2
 
   ingress:
-    host: template-kotlin-dev.hmpps.service.justice.gov.uk
+    host: datahub-query-metrics-dev.hmpps.service.justice.gov.uk
     # modsecurity_enabled: true
 
   env:

@@ -1,9 +1,9 @@
 services:
-  hmpps-template-kotlin:
-    image: ghcr.io/ministryofjustice/hmpps-template-kotlin:latest
+  hmpps-datahub-query-metrics:
+    image: ghcr.io/ministryofjustice/hmpps-datahub-query-metrics:latest
     networks:
       - hmpps
-    container_name: hmpps-template-kotlin
+    container_name: hmpps-datahub-query-metrics
     ports:
       - "8080:8080"
     healthcheck:
