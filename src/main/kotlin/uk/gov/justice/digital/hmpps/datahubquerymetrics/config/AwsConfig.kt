@@ -54,7 +54,6 @@ class AwsConfig {
   }
 
   @Bean
-  @ConditionalOnMissingBean(AthenaClient::class)
   @ConditionalOnBean(StsAssumeRoleCredentialsProvider::class)
   fun athenaClient(
     stsAssumeRoleCredentialsProvider: StsAssumeRoleCredentialsProvider,
