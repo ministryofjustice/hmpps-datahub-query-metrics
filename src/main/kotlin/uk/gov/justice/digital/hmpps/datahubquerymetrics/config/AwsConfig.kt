@@ -44,7 +44,7 @@ class AwsConfig {
 
     return StsAssumeRoleCredentialsProvider(
       bootstrapCredentialsProvider = DefaultChainCredentialsProvider(),
-      region = properties.getRegion(),
+      region = properties.region,
       assumeRoleParameters = AssumeRoleParameters(
         roleArn = properties.getStsRoleArn(),
         roleSessionName = properties.sts.roleSessionName,
@@ -60,7 +60,7 @@ class AwsConfig {
     stsAssumeRoleCredentialsProvider: StsAssumeRoleCredentialsProvider,
     properties: AwsProperties,
   ): AthenaClient = AthenaClient {
-    region = properties.getRegion()
+    region = properties.region
     credentialsProvider = stsAssumeRoleCredentialsProvider
   }
 
@@ -70,7 +70,7 @@ class AwsConfig {
     stsAssumeRoleCredentialsProvider: StsAssumeRoleCredentialsProvider,
     properties: AwsProperties,
   ): RedshiftDataClient = RedshiftDataClient {
-    region = properties.getRegion()
+    region = properties.region
     credentialsProvider = stsAssumeRoleCredentialsProvider
   }
 }
