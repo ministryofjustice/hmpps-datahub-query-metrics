@@ -30,8 +30,6 @@ class AwsProperties(
   )
 
   fun getStsRoleArn(): String = "arn:aws:iam::$accountId:role/${sts.roleName}"
-
-  fun getRegion(): String = region
 }
 
 @Configuration
