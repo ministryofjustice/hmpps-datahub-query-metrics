@@ -23,17 +23,15 @@ class AwsConfig(
   private val stsRoleArn: String = "arn:aws:iam::$accountId:role/$roleName"
 
   @Bean
-  fun stsAssumeRoleCredentialsProvider(): StsAssumeRoleCredentialsProvider {
-    return StsAssumeRoleCredentialsProvider(
-      bootstrapCredentialsProvider = DefaultChainCredentialsProvider(),
-      region = awsRegion,
-      assumeRoleParameters = AssumeRoleParameters(
-        roleArn = stsRoleArn,
-        roleSessionName = roleSessionName,
-        duration = tokenRefreshDurationSec.toDuration(DurationUnit.SECONDS),
-      ),
-    )
-  }
+  fun stsAssumeRoleCredentialsProvider(): StsAssumeRoleCredentialsProvider = StsAssumeRoleCredentialsProvider(
+    bootstrapCredentialsProvider = DefaultChainCredentialsProvider(),
+    region = awsRegion,
+    assumeRoleParameters = AssumeRoleParameters(
+      roleArn = stsRoleArn,
+      roleSessionName = roleSessionName,
+      duration = tokenRefreshDurationSec.toDuration(DurationUnit.SECONDS),
+    ),
+  )
 
   @Bean
   @ConditionalOnBean(StsAssumeRoleCredentialsProvider::class)
