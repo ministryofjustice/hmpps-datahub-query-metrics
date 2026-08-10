@@ -4,7 +4,6 @@ import aws.sdk.kotlin.services.athena.AthenaClient
 import aws.sdk.kotlin.services.athena.batchGetQueryExecution
 import aws.sdk.kotlin.services.athena.listQueryExecutions
 import aws.sdk.kotlin.services.athena.model.AthenaException
-import aws.sdk.kotlin.services.athena.model.ListQueryExecutionsResponse
 import aws.sdk.kotlin.services.athena.model.QueryExecution
 import aws.sdk.kotlin.services.athena.model.QueryExecutionState
 import aws.sdk.kotlin.services.sts.StsClient
@@ -33,10 +32,12 @@ class AthenaMetricsExtractor(
   }
 
   override suspend fun extractQueryMetrics(): Collection<SingleQueryMetricsInfo> {
-    println("""
+    println(
+      """
       ${athenaClient.config.region}
-      ${athenaClient.config.toString()}
-    """.trimIndent())
+      ${athenaClient.config}
+      """.trimIndent(),
+    )
     StsClient.fromEnvironment().use { sts ->
       val identity = sts.getCallerIdentity(GetCallerIdentityRequest {})
       println("acc: ${identity.account} || arn: ${identity.arn} || userid: ${identity.userId}")
@@ -54,7 +55,7 @@ class AthenaMetricsExtractor(
           nextToken = token
         }
       }.onFailure {
-        when(it) {
+        when (it) {
           is AthenaException -> {
             log.error(
               """
@@ -62,7 +63,7 @@ class AthenaMetricsExtractor(
             trace: ${it.stackTraceToString()}\n
             cause: ${it.cause}\n
             sdkmetadata: ${it.sdkErrorMetadata}\n
-          """.trimIndent(),
+              """.trimIndent(),
               it,
             )
             throw(it.cause as AthenaException)
