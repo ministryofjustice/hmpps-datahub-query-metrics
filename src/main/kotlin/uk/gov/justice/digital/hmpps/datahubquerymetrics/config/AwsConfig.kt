@@ -16,7 +16,6 @@ import org.springframework.context.annotation.Configuration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
-
 @ConfigurationProperties("aws")
 class AwsProperties(
   var region: String = "eu-west-2",
@@ -51,8 +50,8 @@ class AwsConfig {
       assumeRoleParameters = AssumeRoleParameters(
         roleArn = properties.getStsRoleArn(),
         roleSessionName = properties.sts.roleSessionName,
-        duration = properties.sts.tokenRefreshDurationSec.toDuration(DurationUnit.SECONDS)
-      )
+        duration = properties.sts.tokenRefreshDurationSec.toDuration(DurationUnit.SECONDS),
+      ),
     ).cached()
   }
 
@@ -66,7 +65,6 @@ class AwsConfig {
     region = properties.getRegion()
     credentialsProvider = stsAssumeRoleCredentialsProvider
   }
-
 
   @Bean
   @ConditionalOnBean(StsAssumeRoleCredentialsProvider::class)
