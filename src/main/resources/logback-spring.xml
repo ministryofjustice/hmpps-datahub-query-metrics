@@ -12,7 +12,7 @@
     </encoder>
   </appender>
 
-  <logger name="uk.gov.justice.digital.hmpps.datahubquerymetrics.DatahubQueryMetricsKt" additivity="false" level="DEBUG">
+  <logger name="uk.gov.justice.digital.hmpps.datahubquerymetrics.HmppsDatahubQueryMetrics" additivity="false" level="DEBUG">
     <appender-ref ref="consoleAppender"/>
   </logger>
 

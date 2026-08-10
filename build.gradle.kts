@@ -1,17 +1,26 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "10.5.4"
-  kotlin("plugin.spring") version "2.4.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "11.0.2"
+  kotlin("plugin.spring") version "2.4.10"
 }
 
 dependencies {
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:2.5.0")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:3.0.0")
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-webclient")
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
+  implementation("aws.sdk.kotlin:athena:1.8.14")
+  implementation("aws.sdk.kotlin:redshiftdata:1.8.14")
+  implementation("io.prometheus:prometheus-metrics-core")
+  implementation("io.prometheus:prometheus-metrics-exporter-httpserver")
+  implementation("org.springframework.boot:spring-boot-starter-actuator")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.11.0")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.11.0")
+  testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test-jvm:1.11.0")
 
-  testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:2.5.0")
+  testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:3.0.0")
   testImplementation("org.springframework.boot:spring-boot-starter-webflux-test")
   testImplementation("org.wiremock:wiremock-standalone:3.13.2")
+  testImplementation("org.springframework.boot:spring-boot-test-autoconfigure")
   testImplementation("io.swagger.parser.v3:swagger-parser:2.1.44") {
     exclude(group = "io.swagger.core.v3")
   }

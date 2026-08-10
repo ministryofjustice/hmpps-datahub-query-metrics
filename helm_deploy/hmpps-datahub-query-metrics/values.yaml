@@ -1,8 +1,8 @@
 generic-service:
   nameOverride: hmpps-datahub-query-metrics
-  productId: "DPS012" # productId for the product that this belongs too, i.e. DPS001, see README.md for details
+  productId: "DPS012"
 
-  replicaCount: 4
+  replicaCount: 1
 
   image:
     repository: ghcr.io/ministryofjustice/hmpps-datahub-query-metrics
@@ -18,25 +18,17 @@ generic-service:
   env:
     SERVER_PORT: "8080"
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.json
-    # JAVA_TOOL_OPTIONS is set in the base image (hmpps-eclipse-temurin) with:
-    #   -XX:MaxRAMPercentage=50.0
-    # Uncomment below to override memory settings if needed.
-    # Check resources.limits.memory is set appropriately.
-    #
-    # Percentage-based example:
-    #   JAVA_TOOL_OPTIONS: "-XX:InitialRAMPercentage=50.0 -XX:MaxRAMPercentage=75.0"
-    #
-    # Fixed memory example:
-    #   JAVA_TOOL_OPTIONS: "-Xms512m -Xmx1024m"
-
-  # Pre-existing kubernetes secrets to load as environment variables in the deployment.
-  # namespace_secrets:
-  #   [name of kubernetes secret]:
-  #     [name of environment variable as seen by app]: [key of kubernetes secret to load]
+    REDSHIFT_DATA_DB: datamart
 
   namespace_secrets:
     hmpps-datahub-query-metrics-application-insights:
       APPLICATIONINSIGHTS_CONNECTION_STRING: "APPLICATIONINSIGHTS_CONNECTION_STRING"
+    hmpps-datahub-query-metrics-datasource-details:
+      ATHENA_WORKGROUP: athena_workgroup
+      REDSHIFT_DATA_SECRETARN: "secretarn"
+      REDSHIFT_JDBC_USER: "user"
+      REDSHIFT_JDBC_PASSWORD: "password"
+      REDSHIFT_JDBC_URL: "url"
 
 generic-prometheus-alerts:
-  targetApplication: hmpps-datahub-query-metrics
+  targetApplication: digital-prison-reporting-prod

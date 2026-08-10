@@ -1,14 +1,14 @@
 ---
 generic-service:
-  serviceAccountName: "datahub-query-metrics-dev-cross-iam"
+  serviceAccountName: "datahub-query-metrics-test-cross-iam"
 
   ingress:
-    host: hmpps-datahub-query-metrics-dev.hmpps.service.justice.gov.uk
+    host: hmpps-datahub-query-metrics-test.hmpps.service.justice.gov.uk
     modsecurity_enabled: true
 
   env:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: "applicationinsights.dev.json"
-    REDSHIFT_DATA_CLUSTER_ID: dpr-redshift-development
+    REDSHIFT_DATA_CLUSTER_ID: dpr-redshift-test
 
   allowlist:
     groups:
@@ -17,4 +17,4 @@ generic-service:
 
 generic-prometheus-alerts:
   businessHoursOnly: true
-  alertSeverity: digital-prison-reporting-dev
+  alertSeverity: digital-prison-reporting-test

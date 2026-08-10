@@ -1,26 +1,28 @@
 info.app:
-  name: HMPPS Datahub Query Metrics
+  name: HMPPS Template Kotlin
   version: 1.0
 
 spring:
+  autoconfigure:
+    exclude:
+      uk.gov.justice.hmpps.kotlin.auth.HmppsResourceServerConfiguration
   application:
     name: hmpps-datahub-query-metrics
+  datasource:
+    url: ${REDSHIFT_JDBC_URL}
+    username: ${REDSHIFT_JDBC_USER}
+    password: ${REDSHIFT_JDBC_PASSWORD}
+    driver-class-name: com.amazon.redshift.jdbc.Driver
+    hikari:
+      maximum-pool-size: 30
+      minimum-idle: 10
+      pool-name: redshift-pool
 
 #  This jackson configuration is only applied for java.util.Date.
 #  It is ignored for LocalDateTime, and therefore unnecessary for most projects
 #  jackson:
 #    date-format: "yyyy-MM-dd HH:mm:ss"
 
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: ${hmpps-auth.url}/.well-known/jwks.json
-
-      client:
-        provider:
-          hmpps-auth:
-            token-uri: ${hmpps-auth.url}/oauth/token
   http:
     codecs:
       max-in-memory-size: 10MB
@@ -41,11 +43,13 @@ server:
   shutdown: graceful
 
 management:
+  metrics:
+    all: false
   endpoints:
     web:
       base-path: /
       exposure:
-        include: 'info, health'
+        include: '*'
   endpoint:
     health:
       cache:
@@ -63,3 +67,11 @@ springdoc:
     enabled: false
   swagger-ui:
     enabled: false
+
+dpr:
+  athena:
+    workgroup: dpr-generic-athena-workgroup
+  redshift:
+    secretarn: ${REDSHIFT_DATA_SECRETARN}
+    clusterid: ${REDSHIFT_DATA_CLUSTER_ID}
+    database: ${REDSHIFT_DATA_DB}

@@ -2,10 +2,12 @@ package uk.gov.justice.digital.hmpps.datahubquerymetrics
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.scheduling.annotation.EnableScheduling
 
 @SpringBootApplication
-class DatahubQueryMetrics
+@EnableScheduling
+class DatahubQueryMetricsKt
 
 fun main(args: Array<String>) {
-  runApplication<DatahubQueryMetrics>(*args)
+  runApplication<DatahubQueryMetricsKt>(*args)
 }
