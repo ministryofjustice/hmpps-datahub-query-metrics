@@ -10,7 +10,6 @@ import aws.sdk.kotlin.services.sts.StsClient
 import aws.sdk.kotlin.services.sts.getCallerIdentity
 import aws.sdk.kotlin.services.sts.model.GetCallerIdentityRequest
 import aws.smithy.kotlin.runtime.InternalApi
-import aws.smithy.kotlin.runtime.collections.AttributeKey
 import aws.smithy.kotlin.runtime.time.toJvmInstant
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -38,7 +37,7 @@ class AthenaMetricsExtractor(
     println(
       """
       ${athenaClient.config.region}
-      ${athenaClient.config.toString()}
+      ${athenaClient.config}
       """.trimIndent(),
     )
     StsClient.fromEnvironment().use { sts ->
@@ -68,8 +67,10 @@ class AthenaMetricsExtractor(
             
             cause: ${it.cause}\n
             
-            sdkmetadata: ${it.sdkErrorMetadata.errorCode} || ${it.sdkErrorMetadata.errorType.name} || ${it.sdkErrorMetadata.errorMessage} || ${it.sdkErrorMetadata.protocolResponse.summary} || ${it.sdkErrorMetadata.clientContext.joinToString("|-|")} || ${it.sdkErrorMetadata.attributes.toString()} \n
-              """.trimIndent(), it)
+            sdkmetadata: ${it.sdkErrorMetadata.errorCode} || ${it.sdkErrorMetadata.errorType.name} || ${it.sdkErrorMetadata.errorMessage} || ${it.sdkErrorMetadata.protocolResponse.summary} || ${it.sdkErrorMetadata.clientContext.joinToString("|-|")} || ${it.sdkErrorMetadata.attributes} \n
+              """.trimIndent(),
+              it,
+            )
             throw(it.cause as AthenaException)
           }
           else -> {
