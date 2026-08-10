@@ -10,6 +10,7 @@ dependencies {
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
   implementation("aws.sdk.kotlin:athena:1.8.14")
   implementation("aws.sdk.kotlin:redshiftdata:1.8.14")
+  implementation("aws.sdk.kotlin:sts:1.8.14")
   implementation("io.prometheus:prometheus-metrics-core")
   implementation("io.prometheus:prometheus-metrics-exporter-httpserver")
   implementation("org.springframework.boot:spring-boot-starter-actuator")

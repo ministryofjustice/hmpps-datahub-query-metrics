@@ -19,6 +19,7 @@ generic-service:
     SERVER_PORT: "8080"
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.json
     REDSHIFT_DATA_DB: datamart
+    AWS_STS_ENABLED: true
 
   namespace_secrets:
     hmpps-datahub-query-metrics-application-insights:

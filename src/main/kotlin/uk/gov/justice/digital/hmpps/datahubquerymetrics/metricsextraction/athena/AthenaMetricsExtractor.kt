@@ -3,8 +3,13 @@ package uk.gov.justice.digital.hmpps.datahubquerymetrics.metricsextraction.athen
 import aws.sdk.kotlin.services.athena.AthenaClient
 import aws.sdk.kotlin.services.athena.batchGetQueryExecution
 import aws.sdk.kotlin.services.athena.listQueryExecutions
+import aws.sdk.kotlin.services.athena.model.AthenaException
+import aws.sdk.kotlin.services.athena.model.ListQueryExecutionsResponse
 import aws.sdk.kotlin.services.athena.model.QueryExecution
 import aws.sdk.kotlin.services.athena.model.QueryExecutionState
+import aws.sdk.kotlin.services.sts.StsClient
+import aws.sdk.kotlin.services.sts.getCallerIdentity
+import aws.sdk.kotlin.services.sts.model.GetCallerIdentityRequest
 import aws.smithy.kotlin.runtime.time.toJvmInstant
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -28,17 +33,46 @@ class AthenaMetricsExtractor(
   }
 
   override suspend fun extractQueryMetrics(): Collection<SingleQueryMetricsInfo> {
+    println("""
+      ${athenaClient.config.region}
+      ${athenaClient.config.toString()}
+    """.trimIndent())
+    StsClient.fromEnvironment().use { sts ->
+      val identity = sts.getCallerIdentity(GetCallerIdentityRequest {})
+      println("acc: ${identity.account} || arn: ${identity.arn} || userid: ${identity.userId}")
+    }
     val nowUtc = Instant.now()
     val startTime = nowUtc.minus(2, ChronoUnit.HOURS).truncatedTo(ChronoUnit.HOURS)
     val endTime = nowUtc.minus(1, ChronoUnit.HOURS).truncatedTo(ChronoUnit.HOURS)
     val validExecutions = mutableListOf<QueryExecution>()
     var token: String? = null
     while (true) {
-      val executionsList = athenaClient.listQueryExecutions {
-        workGroup = athenaWorkgroup
-        maxResults = 50
-        nextToken = token
-      }
+      val executionsList = runCatching {
+        athenaClient.listQueryExecutions {
+          workGroup = athenaWorkgroup
+          maxResults = 50
+          nextToken = token
+        }
+      }.onFailure {
+        when(it) {
+          is AthenaException -> {
+            log.error(
+              """
+            msg: ${it.message}\n
+            trace: ${it.stackTraceToString()}\n
+            cause: ${it.cause}\n
+            sdkmetadata: ${it.sdkErrorMetadata}\n
+          """.trimIndent(),
+              it,
+            )
+            throw(it.cause as AthenaException)
+          }
+          else -> {
+            log.error("Other error: ${it.message} || \n${it.stackTraceToString()}", it)
+            throw(it)
+          }
+        }
+      }.getOrNull()!!
       token = executionsList.nextToken
       if (executionsList.queryExecutionIds.isNullOrEmpty()) {
         break
