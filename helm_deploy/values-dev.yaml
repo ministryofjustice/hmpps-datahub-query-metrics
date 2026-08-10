@@ -9,6 +9,7 @@ generic-service:
   env:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: "applicationinsights.dev.json"
     REDSHIFT_DATA_CLUSTER_ID: dpr-redshift-development
+    AWS_ACCOUNTID: "771283872747"
 
   allowlist:
     groups:

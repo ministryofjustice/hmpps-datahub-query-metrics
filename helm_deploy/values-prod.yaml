@@ -8,6 +8,7 @@ generic-service:
 
   env:
     REDSHIFT_DATA_CLUSTER_ID: dpr-redshift-production
+    AWS_ACCOUNTID: "004723187462"
  
   allowlist:
     groups:
