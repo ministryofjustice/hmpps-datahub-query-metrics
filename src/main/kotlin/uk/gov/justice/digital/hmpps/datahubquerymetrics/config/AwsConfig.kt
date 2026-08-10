@@ -5,60 +5,42 @@ import aws.sdk.kotlin.runtime.auth.credentials.DefaultChainCredentialsProvider
 import aws.sdk.kotlin.runtime.auth.credentials.StsAssumeRoleCredentialsProvider
 import aws.sdk.kotlin.services.athena.AthenaClient
 import aws.sdk.kotlin.services.redshiftdata.RedshiftDataClient
-import aws.smithy.kotlin.runtime.auth.awscredentials.CredentialsProvider
-import aws.smithy.kotlin.runtime.auth.awscredentials.cached
-import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
-import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
-@ConfigurationProperties("aws")
-class AwsProperties(
-  var region: String = "eu-west-2",
-  var accountId: String = "",
-  var sts: Sts = Sts(),
-) {
-
-  class Sts(
-    var tokenRefreshDurationSec: Int = 3600,
-    var roleName: String = "dpr-data-api-cross-account-role",
-    var roleSessionName: String = "dpr-cross-account-role-session",
-  )
-
-  fun getStsRoleArn(): String = "arn:aws:iam::$accountId:role/${sts.roleName}"
-}
-
 @Configuration
-class AwsConfig {
-  companion object {
-    private val log = LoggerFactory.getLogger(this::class.java)
-  }
+class AwsConfig(
+  @Value($$"${aws.accountid}") private val accountId: String,
+) {
+  private val awsRegion = "eu-west-2"
+  private val tokenRefreshDurationSec: Int = 3600
+  private val roleName: String = "dpr-data-api-cross-account-role"
+  private val roleSessionName: String = "dpr-cross-account-role-session"
+  private val stsRoleArn: String = "arn:aws:iam::$accountId:role/$roleName"
 
   @Bean
-  fun stsAssumeRoleCredentialsProvider(properties: AwsProperties): CredentialsProvider {
-    log.debug("AWS properties: {}", properties)
-
+  fun stsAssumeRoleCredentialsProvider(): StsAssumeRoleCredentialsProvider {
     return StsAssumeRoleCredentialsProvider(
       bootstrapCredentialsProvider = DefaultChainCredentialsProvider(),
-      region = properties.region,
+      region = awsRegion,
       assumeRoleParameters = AssumeRoleParameters(
-        roleArn = properties.getStsRoleArn(),
-        roleSessionName = properties.sts.roleSessionName,
-        duration = properties.sts.tokenRefreshDurationSec.toDuration(DurationUnit.SECONDS),
+        roleArn = stsRoleArn,
+        roleSessionName = roleSessionName,
+        duration = tokenRefreshDurationSec.toDuration(DurationUnit.SECONDS),
       ),
-    ).cached()
+    )
   }
 
   @Bean
   @ConditionalOnBean(StsAssumeRoleCredentialsProvider::class)
   fun athenaClient(
     stsAssumeRoleCredentialsProvider: StsAssumeRoleCredentialsProvider,
-    properties: AwsProperties,
   ): AthenaClient = AthenaClient {
-    region = properties.region
+    region = awsRegion
     credentialsProvider = stsAssumeRoleCredentialsProvider
   }
 
@@ -66,9 +48,8 @@ class AwsConfig {
   @ConditionalOnBean(StsAssumeRoleCredentialsProvider::class)
   fun redshiftDataClient(
     stsAssumeRoleCredentialsProvider: StsAssumeRoleCredentialsProvider,
-    properties: AwsProperties,
   ): RedshiftDataClient = RedshiftDataClient {
-    region = properties.region
+    region = awsRegion
     credentialsProvider = stsAssumeRoleCredentialsProvider
   }
 }
