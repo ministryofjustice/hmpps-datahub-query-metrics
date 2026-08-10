@@ -33,7 +33,7 @@ import kotlin.String
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ActiveProfiles("test")
 @AutoConfigureWebTestClient
-class IntegrationTest {
+class `__IntegrationTest.txt` {
 
   @Autowired
   lateinit var webTestClient: WebTestClient
