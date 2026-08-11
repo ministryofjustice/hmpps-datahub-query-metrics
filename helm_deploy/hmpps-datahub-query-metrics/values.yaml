@@ -7,7 +7,7 @@ generic-service:
   image:
     repository: ghcr.io/ministryofjustice/hmpps-datahub-query-metrics
     tag: app_version # override at deployment time
-    port: 8080
+    port: 9400
 
   ingress:
     enabled: true
