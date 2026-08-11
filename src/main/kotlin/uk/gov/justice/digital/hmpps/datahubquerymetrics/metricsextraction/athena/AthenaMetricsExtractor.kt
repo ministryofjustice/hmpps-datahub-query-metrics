@@ -3,12 +3,8 @@ package uk.gov.justice.digital.hmpps.datahubquerymetrics.metricsextraction.athen
 import aws.sdk.kotlin.services.athena.AthenaClient
 import aws.sdk.kotlin.services.athena.batchGetQueryExecution
 import aws.sdk.kotlin.services.athena.listQueryExecutions
-import aws.sdk.kotlin.services.athena.model.AthenaException
 import aws.sdk.kotlin.services.athena.model.QueryExecution
 import aws.sdk.kotlin.services.athena.model.QueryExecutionState
-import aws.sdk.kotlin.services.sts.StsClient
-import aws.sdk.kotlin.services.sts.getCallerIdentity
-import aws.sdk.kotlin.services.sts.model.GetCallerIdentityRequest
 import aws.smithy.kotlin.runtime.InternalApi
 import aws.smithy.kotlin.runtime.time.toJvmInstant
 import org.slf4j.LoggerFactory
