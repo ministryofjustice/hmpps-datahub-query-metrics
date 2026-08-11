@@ -34,51 +34,17 @@ class AthenaMetricsExtractor(
 
   @OptIn(InternalApi::class)
   override suspend fun extractQueryMetrics(): Collection<SingleQueryMetricsInfo> {
-    println(
-      """
-      ${athenaClient.config.region}
-      ${athenaClient.config}
-      """.trimIndent(),
-    )
-    StsClient.fromEnvironment().use { sts ->
-      val identity = sts.getCallerIdentity(GetCallerIdentityRequest {})
-      println("acc: ${identity.account} || arn: ${identity.arn} || userid: ${identity.userId}")
-    }
     val nowUtc = Instant.now()
     val startTime = nowUtc.minus(2, ChronoUnit.HOURS).truncatedTo(ChronoUnit.HOURS)
     val endTime = nowUtc.minus(1, ChronoUnit.HOURS).truncatedTo(ChronoUnit.HOURS)
     val validExecutions = mutableListOf<QueryExecution>()
     var token: String? = null
     while (true) {
-      val executionsList = runCatching {
-        athenaClient.listQueryExecutions {
-          workGroup = athenaWorkgroup
-          maxResults = 50
-          nextToken = token
-        }
-      }.onFailure {
-        when (it) {
-          is AthenaException -> {
-            log.error(
-              """
-            msg: ${it.message}\n
-            
-            trace: ${it.stackTraceToString()}\n
-            
-            cause: ${it.cause}\n
-            
-            sdkmetadata: ${it.sdkErrorMetadata.errorCode} || ${it.sdkErrorMetadata.errorType.name} || ${it.sdkErrorMetadata.errorMessage} || ${it.sdkErrorMetadata.protocolResponse.summary} || ${it.sdkErrorMetadata.clientContext.joinToString("|-|")} || ${it.sdkErrorMetadata.attributes} \n
-              """.trimIndent(),
-              it,
-            )
-            throw(it.cause as AthenaException)
-          }
-          else -> {
-            log.error("Other error: ${it.message} || \n${it.stackTraceToString()}", it)
-            throw(it)
-          }
-        }
-      }.getOrNull()!!
+      val executionsList = athenaClient.listQueryExecutions {
+        workGroup = athenaWorkgroup
+        maxResults = 50
+        nextToken = token
+      }
       token = executionsList.nextToken
       if (executionsList.queryExecutionIds.isNullOrEmpty()) {
         break
@@ -100,6 +66,9 @@ class AthenaMetricsExtractor(
       }
     }
 
+    if (validExecutions.isEmpty()) {
+      log.info("No batch executions found for current time period $startTime and end time $endTime")
+    }
     return validExecutions.map {
       val queryInfo = extractQueryInfo(it.query!!)
 
