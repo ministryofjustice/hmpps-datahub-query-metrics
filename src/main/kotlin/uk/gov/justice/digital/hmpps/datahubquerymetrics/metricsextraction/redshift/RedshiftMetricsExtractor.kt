@@ -48,6 +48,7 @@ class RedshiftMetricsExtractor(
           qh.start_time >= date_trunc('hour', current_timestamp) - interval '2 hour'
           AND qh.start_time <  date_trunc('hour', current_timestamp) - interval '1 hour'
           AND qh.query_text ILIKE '%CREATE EXTERNAL TABLE reports._%'
+          AND qh.query_text NOT ILIKE '%sys_query_history%'
         ORDER BY qh.start_time DESC;
       """.trimIndent()
     }
