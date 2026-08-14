@@ -24,10 +24,16 @@ class ExtractionJob(
   fun scheduledFunction() {
     log.info("Starting metrics extraction")
     val results = runBlocking {
-      val athenaResults = athenaMetricsExtractor.extractQueryMetrics()
+      val athenaResults = runCatching {
+        athenaMetricsExtractor.extractQueryMetrics()
+      }.onFailure { log.error("Error during athena metrics extraction", it) }
       val redshiftResults = redshiftMetricsExtractor.extractQueryMetrics()
 
-      athenaResults.plus(redshiftResults)
+      if (athenaResults.isSuccess) {
+        val athenaResultsList = athenaResults.getOrNull()
+        athenaResultsList?.plus(redshiftResults)
+      }
+      redshiftResults
     }
 
     results.forEach {
