@@ -1,6 +1,6 @@
 ---
 generic-service:
-  serviceAccountName: "datahub-query-metrics-prod-cross-iam"
+  serviceAccountName: "datahub-query-metrics-production-cross-iam"
 
   ingress:
     host: hmpps-datahub-query-metrics.hmpps.service.justice.gov.uk
